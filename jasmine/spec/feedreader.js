@@ -79,18 +79,16 @@ $(function() {
         it('changes visibility when menu icon is clicked', function() {
             var $menu = $('.menu-icon-link');
             $menu.click();
-            expect($('body').hasClass('menu-hidden')).toBe(false);
+            expect($('body').hasClass('menu-hidden')).toBeFalsy();
             $menu.click();
-            expect($('body').hasClass('menu-hidden')).toBe(true);
+            expect($('body').hasClass('menu-hidden')).toBeTruthy();
         });
     });
 
     /* A test suite named "Initial Entries" */
     describe('Initial Entries', function() {
         beforeEach(function(done) {
-            loadFeed(0, function() {
-                done();
-            });
+            loadFeed(0, done);
         });
 
         /* A test that ensures when the loadFeed
@@ -99,23 +97,29 @@ $(function() {
          * Remember, loadFeed() is asynchronous so this test wil require
          * the use of Jasmine's beforeEach and asynchronous done() function.
          */
-        it('contains at least a single .entry element after loadFeed is called', function(done) {
-            var $feeds = $('.feed');
-            var $entries = $feeds.find('.entry');
-            expect($entries).toBeDefined();
+        it('contains at least a single .entry element after loadFeed is called', function() {
+            var $entries = $('.feed').find('.entry');
             expect($entries.length).not.toBe(0);
-            done();
         });
     });
 
     /* A test suite named "New Feed Selection" */
     describe('New Feed Selection', function() {
-        var $feed = $('.feed');
+        var oldValue, newValue;
 
         beforeEach(function(done) {
+            var $feed = $('.feed');
+
             $feed.empty();
             loadFeed(0, function() {
-                done();
+                oldValue = $feed.text();
+                console.log('Old Value:\n' + oldValue);
+
+                loadFeed(1, function() {
+                    newValue = $feed.text();
+                    console.log('New Value:\n' + newValue);
+                    done();
+                })
             });
         });
 
@@ -123,15 +127,10 @@ $(function() {
          * by the loadFeed function that the content actually changes.
          * Remember, loadFeed() is asynchronous.
          */
-        it('content actually changes when new feed is loaded', function(done) {
-            var oldContent = $feed.text();
-            expect(oldContent).toBeDefined();
-
-            loadFeed(1, function() {
-                var newContent = $feed.text();
-                expect(oldContent).not.toBe(newContent);
-                done();
-            });
+        it('content actually changes when new feed is loaded', function() {
+            expect(oldValue).toBeDefined();
+            expect(newValue).toBeDefined();
+            expect(oldValue).not.toBe(newValue);
         });
     });
 
